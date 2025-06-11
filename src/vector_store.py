@@ -17,9 +17,10 @@ def vector_store_list():
     for vs in result.data:
         print(f"ID: {vs.id}, Name: {vs.name}, Created: {vs.created_at}")
 
-def vector_store_get(vs_id):
-    vs = openai.vector_stores.retrieve(vs_id)
-    print(f"ID: {vs.id}\nName: {vs.name}\nDescription: {vs.description}\nCreated: {vs.created_at}")
+def vector_store_get(vector_store_id):
+    vs = openai.vector_stores.retrieve(vector_store_id)
+    # Use getattr to avoid AttributeError if description is missing
+    print(f"ID: {vs.id}\nName: {vs.name}\nDescription: {getattr(vs, 'description', '')}\nCreated: {vs.created_at}")
 
 def vector_store_delete(vs_id):
     openai.vector_stores.delete(vs_id)
