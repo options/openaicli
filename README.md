@@ -112,11 +112,16 @@ python src/oai.py vector-store-file delete-file --vector-store-id <ID> --file-id
 ```
 
 **Subcommands:**
-- `list`: List files in a vector store (`--vector-store-id`)
+- `list`: List files in a vector store (`--vector-store-id`, optional: `--filter`, `--order`, `--limit`)
 - `retrieve-file`: Retrieve a file object (`--vector-store-id`, `--file-id`)
 - `retrieve-file-content`: Retrieve file content (`--vector-store-id`, `--file-id`)
 - `update-file-attribute`: Update file attribute (`--vector-store-id`, `--file-id`, `--attribute`, `--value`)
 - `delete-file`: Delete a file (`--vector-store-id`, `--file-id`)
+
+**Options for `list`:**
+- `--filter`: Filter by file status (`in_progress`, `completed`, `failed`, `cancelled`)
+- `--order`: Sort order by created_at (`asc` or `desc`, default: `desc`)
+- `--limit`: Number of files per page (1-100, default: 100)
 
 ---
 
