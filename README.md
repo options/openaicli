@@ -28,12 +28,12 @@ Upload files to OpenAI. Supports wildcards and vector store upload.
 
 **Examples:**
 ```bash
-python src/oai.py file-upload --pattern '*.md'
-python src/oai.py file-upload --pattern 'data.txt' --vector-store-id <ID>
+python src/oai.py file-upload --file '*.md'
+python src/oai.py file-upload --file 'data.txt' --vector-store-id <ID>
 ```
 
 **Options:**
-- `--pattern` (required): File name or wildcard pattern to upload. Example: `*.md`, `data.txt`
+- `--file` (required): File name or wildcard pattern to upload. Example: `*.md`, `data.txt`
 - `--vector-store-id`: (Optional) Vector Store ID to upload files into.
 - `--purpose`: Purpose of the file. Default: `assistants`.
 
@@ -98,17 +98,39 @@ Manage vector stores: create, list, get, delete.
 
 **Examples:**
 ```bash
-python src/oai.py vector-store create --name 'MyStore' --description 'Test'
+python src/oai.py vector-store create --name 'MyStore'
 python src/oai.py vector-store list
 python src/oai.py vector-store get --id <ID>
 python src/oai.py vector-store delete --id <ID>
 ```
 
 **Subcommands:**
-- `create`: Create a new vector store (`--name`, `--description`)
+- `create`: Create a new vector store (`--name`)
 - `list`: List all vector stores
 - `get`: Get details of a vector store (`--id`)
 - `delete`: Delete a vector store (`--id`)
+
+---
+
+#### vector-store-file
+
+Manage files in a vector store: list, retrieve-file, retrieve-file-content, update-file-attribute, delete-file.
+
+**Examples:**
+```bash
+python src/oai.py vector-store-file list --vector-store-id <ID>
+python src/oai.py vector-store-file retrieve-file --vector-store-id <ID> --file-id <FILE_ID>
+python src/oai.py vector-store-file retrieve-file-content --vector-store-id <ID> --file-id <FILE_ID>
+python src/oai.py vector-store-file update-file-attribute --vector-store-id <ID> --file-id <FILE_ID> --attribute metadata --value '{"key":"value"}'
+python src/oai.py vector-store-file delete-file --vector-store-id <ID> --file-id <FILE_ID>
+```
+
+**Subcommands:**
+- `list`: List files in a vector store (`--vector-store-id`)
+- `retrieve-file`: Retrieve a file object (`--vector-store-id`, `--file-id`)
+- `retrieve-file-content`: Retrieve file content (`--vector-store-id`, `--file-id`)
+- `update-file-attribute`: Update file attribute (`--vector-store-id`, `--file-id`, `--attribute`, `--value`)
+- `delete-file`: Delete a file (`--vector-store-id`, `--file-id`)
 
 ---
 
