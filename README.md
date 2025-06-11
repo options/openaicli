@@ -8,6 +8,7 @@ A command-line interface (CLI) for interacting with OpenAI's API, inspired by Az
 - **Ask**: Ask questions using OpenAI's file_search tool and vector store
 - **Chat Completion**: Interact with GPT models (gpt-4o, gpt-3.5-turbo, etc.)
 - **Vector Store Management**: Create, list, get, and delete vector stores
+- **Built-in Help**: Use the `--help` option with any command or subcommand to see detailed usage instructions and available options. For example, `python oai.py --help` or `python oai.py chat --help`.
 
 ## Requirements
 - Python 3.8+
@@ -68,6 +69,14 @@ python oai.py ask --vector-store-id <VECTOR_STORE_ID> --question "What is cloud 
 Chat with GPT models:
 ```sh
 python oai.py chat --model gpt-4o --system "You are a helpful assistant." --message "Hello!"
+```
+
+## Help
+For any command or subcommand, you can view detailed help and usage instructions by adding `--help`. For example:
+```sh
+python oai.py --help
+python oai.py chat --help
+python oai.py vector-store --help
 ```
 
 ## Version Control
