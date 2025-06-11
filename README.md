@@ -58,21 +58,6 @@ python src/oai.py tts --input-file input.txt --output output.mp3
 
 ---
 
-#### ask
-
-Ask a question using OpenAI's file_search tool and vector store.
-
-**Example:**
-```bash
-python src/oai.py ask --vector-store-id <ID> --question 'What is cloud computing?'
-```
-
-**Options:**
-- `--vector-store-id`: Vector Store ID to use for context-aware search.
-- `--question`: Question text.
-
----
-
 #### chat
 
 Chat with GPT models.
@@ -89,6 +74,7 @@ python src/oai.py chat --user 'Stream this answer.' --stream
 - `--system`: System prompt (optional).
 - `--user`: User prompt (optional).
 - `--stream`: Use streaming output.
+- `--vector-store-id`: (Optional) Vector Store ID to use file_search tool in chat.
 
 ---
 

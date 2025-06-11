@@ -5,9 +5,12 @@ import glob
 import os
 from src.file_upload import upload_files
 from src.tts import tts
-from src.ask import ask
 from src.chat import chat
-from src.vector_store import vector_store_create, vector_store_list, vector_store_get, vector_store_delete
+from src.vector_store import (
+    vector_store_create, vector_store_list, vector_store_get, vector_store_delete,
+    vector_store_file_list, vector_store_file_retrieve, vector_store_file_retrieve_content,
+    vector_store_file_update_attribute, vector_store_file_delete
+)
 
 # Get API key from environment variable
 OPENAI_API_KEY = os.getenv("OPENAI_API_KEY")
@@ -26,12 +29,12 @@ def main():
 
     # 파일 업로드
     upload_parser = subparsers.add_parser(
-        "file upload",
+        "file-upload",
         help="Upload files (wildcard supported)",
-        description="Upload files to OpenAI. Supports wildcards and vector store upload.\n\nExamples:\n  python oai.py file upload --pattern '*.md'\n  python oai.py file upload --pattern 'data.txt' --vector-store-id <ID>\n"
+        description="Upload files to OpenAI. Supports wildcards and vector store upload.\n\nExamples:\n  python oai.py file-upload --file '*.md'\n  python oai.py file-upload --file 'data.txt' --vector-store-id <ID>\n"
     )
     upload_parser.add_argument(
-        "--pattern", required=True,
+        "--file", required=True,
         help="File name or wildcard pattern to upload. Example: *.md, data.txt"
     )
     upload_parser.add_argument(
@@ -70,21 +73,6 @@ def main():
         help="TTS voice name. Default: echo"
     )
 
-    # 질문/응답
-    ask_parser = subparsers.add_parser(
-        "ask",
-        help="Ask a question (with vector store search)",
-        description="Ask a question using OpenAI's file_search tool and vector store.\n\nExample:\n  python oai.py ask --vector-store-id <ID> --question 'What is cloud computing?'\n"
-    )
-    ask_parser.add_argument(
-        "--vector-store-id",
-        help="Vector Store ID to use for context-aware search."
-    )
-    ask_parser.add_argument(
-        "--question",
-        help="Question text. If omitted, will prompt for input."
-    )
-
     # Chat Completion
     chat_parser = subparsers.add_parser(
         "chat",
@@ -106,6 +94,10 @@ def main():
     chat_parser.add_argument(
         "--stream", action="store_true",
         help="Use streaming output. Prints tokens as they are generated."
+    )
+    chat_parser.add_argument(
+        "--vector-store-id",
+        help="(Optional) Vector Store ID to use file_search tool in chat."
     )
 
     # Vector Store management
@@ -160,16 +152,104 @@ def main():
         help="Vector Store ID to delete."
     )
 
+    # Vector Store File management
+    vsf_parser = subparsers.add_parser(
+        "vector-store-file",
+        help="Manage files in a vector store",
+        description="Manage files in a vector store: list, retrieve-file, retrieve-file-content, update-file-attribute, delete-file."
+    )
+    vsf_subparsers = vsf_parser.add_subparsers(dest="vsf_command")
+
+    # List files
+    vsf_list = vsf_subparsers.add_parser(
+        "list",
+        help="List files in a vector store"
+    )
+    vsf_list.add_argument(
+        "--vector-store-id", required=True,
+        help="Vector Store ID"
+    )
+
+    # Retrieve file object
+    vsf_retrieve = vsf_subparsers.add_parser(
+        "retrieve-file",
+        help="Retrieve a file object from a vector store"
+    )
+    vsf_retrieve.add_argument(
+        "--vector-store-id", required=True,
+        help="Vector Store ID"
+    )
+    vsf_retrieve.add_argument(
+        "--file-id", required=True,
+        help="File ID"
+    )
+
+    # Retrieve file content
+    vsf_content = vsf_subparsers.add_parser(
+        "retrieve-file-content",
+        help="Retrieve the content of a file from a vector store"
+    )
+    vsf_content.add_argument(
+        "--vector-store-id", required=True,
+        help="Vector Store ID"
+    )
+    vsf_content.add_argument(
+        "--file-id", required=True,
+        help="File ID"
+    )
+
+    # Update file attribute
+    vsf_update = vsf_subparsers.add_parser(
+        "update-file-attribute",
+        help="Update file attributes in a vector store"
+    )
+    vsf_update.add_argument(
+        "--vector-store-id", required=True,
+        help="Vector Store ID"
+    )
+    vsf_update.add_argument(
+        "--file-id", required=True,
+        help="File ID"
+    )
+    vsf_update.add_argument(
+        "--attribute", required=True,
+        help="Attribute name to update (e.g. 'metadata')"
+    )
+    vsf_update.add_argument(
+        "--value", required=True,
+        help="New value for the attribute (JSON string if complex type)"
+    )
+
+    # Delete file
+    vsf_delete = vsf_subparsers.add_parser(
+        "delete-file",
+        help="Delete a file from a vector store"
+    )
+    vsf_delete.add_argument(
+        "--vector-store-id", required=True,
+        help="Vector Store ID"
+    )
+    vsf_delete.add_argument(
+        "--file-id", required=True,
+        help="File ID"
+    )
+
     args = parser.parse_args()
 
-    if args.command == "file upload":
-        upload_files(args.pattern, args.vector_store_id, args.purpose)
+    if args.command == "file-upload":
+        upload_files(args.file, args.vector_store_id, args.purpose)
     elif args.command == "tts":
         tts(text=args.text, input_file=args.input_file, output=args.output, model=args.model, voice=args.voice)
     elif args.command == "ask":
-        ask(vector_store_id=args.vector_store_id, question=args.question)
+        print("The 'ask' command has been removed.")
     elif args.command == "chat":
-        chat(model=args.model, system=args.system, user=args.user, stream=args.stream)
+        chat(
+            model=args.model,
+            system=args.system,
+            user=args.user,
+            stream=args.stream,
+            vector_store_id=args.vector_store_id
+        )
     elif args.command == "vector-store":
         if args.vs_command == "create":
             vector_store_create(args.name, args.description)
@@ -181,6 +261,28 @@ def main():
             vector_store_delete(args.id)
         else:
             print("No vector store subcommand specified. Use create, list, get, or delete.")
+    elif args.command == "vector-store-file":
+        if args.vsf_command == "list":
+            vector_store_file_list(args.vector_store_id)
+        elif args.vsf_command == "retrieve-file":
+            vector_store_file_retrieve(args.vector_store_id, args.file_id)
+        elif args.vsf_command == "retrieve-file-content":
+            vector_store_file_retrieve_content(args.vector_store_id, args.file_id)
+        elif args.vsf_command == "update-file-attribute":
+            import json
+            try:
+                value = json.loads(args.value)
+            except Exception:
+                value = args.value
+            vector_store_file_update_attribute(
+                args.vector_store_id,
+                args.file_id,
+                **{args.attribute: value}
+            )
+        elif args.vsf_command == "delete-file":
+            vector_store_file_delete(args.vector_store_id, args.file_id)
+        else:
+            print("No vector store file subcommand specified. Use list, retrieve-file, retrieve-file-content, update-file-attribute, or delete-file.")
     else:
         parser.print_help()
 
