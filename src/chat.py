@@ -5,28 +5,50 @@ import os
 OPENAI_API_KEY = os.getenv("OPENAI_API_KEY")
 openai.api_key = OPENAI_API_KEY
 
-def chat(model="gpt-4o", system=None, user=None, stream=False):
+def chat(model="gpt-4o", system=None, user=None, stream=False, vector_store_id=None):
+    import openai
+
+    if not user:
+        user = input("User: ")
+
     messages = []
     if system:
         messages.append({"role": "system", "content": system})
-    if user:
-        messages.append({"role": "user", "content": user})
+    messages.append({"role": "user", "content": user})
+
+    # vector_store_id가 있으면 file_search tool 사용
+    if vector_store_id:
+        client = openai.OpenAI()
+        response = client.responses.create(
+            model=model,
+            input=user,
+            tools=[{
+                "type": "file_search",
+                "vector_store_ids": [vector_store_id]
+            }],
+            stream=stream
+        )
+        if stream:
+            for chunk in response:
+                if hasattr(chunk, "delta") and chunk.delta:
+                    print(chunk.delta, end="", flush=True)
+            print()
+        else:
+            # 비스트림 응답
+            print(response)
     else:
-        user_input = input("User: ")
-        messages.append({"role": "user", "content": user_input})
-    if stream:
-        response = openai.chat.completions.create(
+        # 기존 방식 (tools 없이 일반 chat)
+        completion = openai.chat.completions.create(
             model=model,
             messages=messages,
-            stream=True
+            stream=stream
         )
-        for chunk in response:
-            if hasattr(chunk.choices[0].delta, "content") and chunk.choices[0].delta.content:
-                print(chunk.choices[0].delta.content, end="", flush=True)
-        print()
-    else:
-        response = openai.chat.completions.create(
-            model=model,
-            messages=messages
-        )
-        print(response.choices[0].message.content)
+        if stream:
+            for chunk in completion:
+                if hasattr(chunk, "choices") and chunk.choices:
+                    delta = chunk.choices[0].delta
+                    if hasattr(delta, "content") and delta.content:
+                        print(delta.content, end="", flush=True)
+            print()
+        else:
+            print(completion.choices[0].message.content)
