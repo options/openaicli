@@ -15,15 +15,19 @@ A command-line interface (CLI) for interacting with OpenAI's API, inspired by Az
 - (Optional) `python-dotenv` if you want to use a `.env` file for your API key
 
 ## Setup
-1. **Install dependencies:**
+1. **Create and activate a virtual environment:**
    ```sh
-   pip install openai
+   python -m venv .venv
+   # Windows
+   .\.venv\Scripts\activate
+   # macOS/Linux
+   source .venv/bin/activate
    ```
-   (Optional for .env support)
+2. **Install dependencies:**
    ```sh
-   pip install python-dotenv
+   pip install openai python-dotenv
    ```
-2. **Set your OpenAI API key as an environment variable:**
+3. **Set your OpenAI API key as an environment variable:**
    ```sh
    $env:OPENAI_API_KEY="sk-..."   # PowerShell
    # or
@@ -63,26 +67,8 @@ python oai.py ask --vector-store-id <VECTOR_STORE_ID> --question "What is cloud 
 ### Chat Completion
 Chat with GPT models:
 ```sh
-python oai.py chat --user "Tell me a joke."
-python oai.py chat --system "You are a helpful assistant." --user "Summarize this document."
-python oai.py chat --user "Stream this answer." --stream
+python oai.py chat --model gpt-4o --system "You are a helpful assistant." --message "Hello!"
 ```
 
-### Vector Store Management
-Create, list, get, and delete vector stores:
-```sh
-python oai.py vector-store create --name "MyStore" --description "Test vector store"
-python oai.py vector-store list
-python oai.py vector-store get --id <VECTOR_STORE_ID>
-python oai.py vector-store delete --id <VECTOR_STORE_ID>
-```
-
-## Help
-For help on any command, use:
-```sh
-python oai.py --help
-python oai.py <command> --help
-```
-
-## License
-MIT License
+## Version Control
+The `.venv/` folder is used for the Python virtual environment and is excluded from the Git repository (see `.gitignore`).
